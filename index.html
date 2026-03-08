@@ -8,12 +8,12 @@
         :root { --gold: #ff8c00; --bg: #0b0f19; --card: #161b22; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding-bottom: 20px; }
         
-        /* Login Screen */
+        /* Login Screen Overlay */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .login-card { width: 85%; max-width: 350px; background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); text-align: center; }
         .login-btn { width: 100%; padding: 12px; margin-top: 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; background: #fff; color: #000; }
 
-        /* Main App */
+        /* Main App Interface */
         .app-header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .logo-text { font-size: 20px; font-weight: 900; color: var(--gold); }
         .user-pic { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--gold); }
@@ -25,25 +25,26 @@
 
         /* Category Grid */
         .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .cat-card { background: var(--card); border-radius: 15px; border: 1px solid #30363d; overflow: hidden; cursor: pointer; text-align: center; padding-bottom: 12px; }
+        .cat-card { background: var(--card); border-radius: 15px; border: 1px solid #30363d; overflow: hidden; cursor: pointer; text-align: center; padding-bottom: 12px; transition: 0.3s; }
+        .cat-card:hover { border-color: var(--gold); }
         .cat-card img { width: 100%; height: 110px; object-fit: cover; border-bottom: 1px solid #30363d; }
-        .cat-card h4 { margin: 10px 0 0 0; font-size: 15px; }
+        .cat-card h4 { margin: 10px 0 0 0; font-size: 15px; color: #fff; }
 
-        /* Packages */
+        /* Package Items */
         .pkg-item { background: var(--card); padding: 16px; border-radius: 12px; border: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 10px; }
         .pkg-item.selected { border-color: var(--gold); background: #1c2128; box-shadow: 0 0 10px rgba(255,140,0,0.2); }
         
-        .input-box { width: 92%; padding: 15px; margin-top: 12px; border-radius: 10px; border: 1px solid #30363d; background: #fff; color: #000; font-weight: bold; }
-        .buy-btn { width: 100%; background: linear-gradient(45deg, #ff8c00, #ff4500); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .input-box { width: 92%; padding: 15px; margin-top: 15px; border-radius: 10px; border: 1px solid #30363d; background: #fff; color: #000; font-weight: bold; font-size: 16px; }
+        .buy-btn { width: 100%; background: linear-gradient(45deg, #ff8c00, #ff4500); color: white; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color: var(--gold); margin: 0;">ELITE STORE</h2>
-        <p style="font-size: 14px; color: #9ca3af;">অর্ডার করতে জিমেইল দিয়ে লগইন করুন</p>
-        <button class="login-btn" id="btn-google">
+        <h2 style="color: var(--gold); margin: 0;">ELITE TOPUP</h2>
+        <p style="font-size: 14px; color: #9ca3af; margin-top: 5px;">অর্ডার করতে জিমেইল দিয়ে লগইন করুন</p>
+        <button class="login-btn" id="google-login">
             <img src="https://cdn-icons-png.flaticon.com/128/300/300221.png" width="20"> Login with Google
         </button>
     </div>
@@ -52,15 +53,15 @@
 <div class="app-header">
     <div class="logo-text">ELITE STORE</div>
     <div style="display: flex; align-items: center; gap: 10px;">
-        <span id="uName" style="font-size: 12px; color: #9ca3af;"></span>
-        <img id="uPic" class="user-pic" src="">
+        <span id="display-name" style="font-size: 12px; color: #9ca3af;"></span>
+        <img id="display-pic" class="user-pic" src="">
     </div>
 </div>
 
 <div class="container">
     <div id="category-screen" class="screen active">
         <h3 style="margin: 10px 0;">Select Topup Type</h3>
-        <div class="category-grid" id="cat-list"></div>
+        <div class="category-grid" id="category-list"></div>
     </div>
 
     <div id="packs-screen" class="screen">
@@ -91,30 +92,35 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    let userDetails = null;
+    let currentUser = null;
 
-    document.getElementById('btn-google').onclick = () => {
-        signInWithPopup(auth, provider).catch(e => alert("Error: " + e.message));
+    // লগইন বাটন ক্লিক
+    document.getElementById('google-login').onclick = () => {
+        signInWithPopup(auth, provider).catch((error) => alert("Login Error: " + error.message));
     };
 
+    // লগইন স্টেট চেক
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            userDetails = user;
-            document.getElementById('uName').innerText = user.displayName;
-            document.getElementById('uPic').src = user.photoURL;
+            currentUser = user;
+            document.getElementById('display-name').innerText = user.displayName;
+            document.getElementById('display-pic').src = user.photoURL;
             document.getElementById('login-screen').style.display = 'none';
             loadHome();
+        } else {
+            document.getElementById('login-screen').style.display = 'flex';
         }
     });
 
     const allData = {
         "UID Topup": [ {n: "115 Diamonds", p: 85}, {n: "240 Diamonds", p: 165}, {n: "610 Diamonds", p: 425} ],
         "Weekly": [ {n: "Weekly Lite", p: 150}, {n: "Weekly Super", p: 190} ],
-        "Monthly": [ {n: "Monthly Lite", p: 550} ]
+        "Monthly": [ {n: "Monthly Lite", p: 550} ],
+        "LevelUp Pass": [ {n: "LevelUp Pass", p: 180} ]
     };
 
     function loadHome() {
-        const list = document.getElementById('cat-list');
+        const list = document.getElementById('category-list');
         list.innerHTML = "";
         for (let cat in allData) {
             list.innerHTML += `<div class="cat-card" onclick="openPacks('${cat}')">
@@ -151,11 +157,12 @@
         let trx = document.getElementById('trxID').value;
         if(!window.selectedPack || !pid || !trx) { alert("সব তথ্য দিন!"); return; }
 
-        let msg = `🔥 NEW ORDER!\n👤 User: ${userDetails.displayName}\n📧 Email: ${userDetails.email}\n🎮 Type: ${document.getElementById('packTitle').innerText}\n📦 Pkg: ${window.selectedPack.name}\n💰 Price: ${window.selectedPack.price} TK\n🆔 ID: ${pid}\n🧾 TrxID: ${trx}`;
+        let msg = `🔥 NEW ORDER!\n👑 Shop: Elite Store\n👤 User: ${currentUser.displayName}\n📧 Email: ${currentUser.email}\n🎮 Type: ${document.getElementById('packTitle').innerText}\n📦 Pkg: ${window.selectedPack.name}\n💰 Price: ${window.selectedPack.price} TK\n🆔 ID: ${pid}\n🧾 TrxID: ${trx}`;
         
         fetch(`https://api.telegram.org/bot8389300808:AAHdLcNY4V8zxc8hmAVLYputQHTQpyuQpkM/sendMessage?chat_id=6980640033&text=${encodeURIComponent(msg)}`)
         .then(() => alert("অর্ডার সফল হয়েছে!"));
     };
 </script>
+
 </body>
 </html>
