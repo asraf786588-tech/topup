@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Topup Store</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0c10; color: #66fcf1; text-align: center; margin: 0; padding-bottom: 80px; }
+        .header { background: #1f2833; padding: 20px; border-bottom: 3px solid #66fcf1; }
+        .container { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .card { background: #1f2833; padding: 15px; border-radius: 12px; border: 1px solid #45a29e; }
+        .price { color: #fff; font-size: 18px; font-weight: bold; margin: 8px 0; }
+        button { background: #66fcf1; color: #0b0c10; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* Payment Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: #1f2833; margin: 15% auto; padding: 20px; width: 85%; border-radius: 15px; border: 2px solid #66fcf1; }
+        .bkash-box { background: #d12053; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        input { width: 90%; padding: 12px; margin: 8px 0; border-radius: 5px; border: 1px solid #45a29e; background: #0b0c10; color: white; }
+        
+        /* WhatsApp Floating Button */
+        .whatsapp-btn { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: white; padding: 15px; border-radius: 50%; text-decoration: none; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0;">ELITE TOPUP STORE</h2>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h4>Weekly 1x</h4>
+            <div class="price">৳ ১৫৩</div>
+            <button onclick="openPayment('Weekly Membership', 153)">Buy Now</button>
+        </div>
+        <div class="card">
+            <h4>Monthly 1x</h4>
+            <div class="price">৳ ৭৬০</div>
+            <button onclick="openPayment('Monthly Membership', 760)">Buy Now</button>
+        </div>
+    </div>
+
+    <a href="https://wa.me/8801797211045" class="whatsapp-btn" target="_blank">💬</a>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h3 id="packName" style="color:#66fcf1;">পেমেন্ট করুন</h3>
+            <div class="bkash-box">
+                <p style="margin:0;">বিকাশ (Send Money)</p>
+                <h2 style="margin:5px 0;">01797211045</h2>
+                <p style="font-size:11px; color:#ffbc00;">বিকাশ সেন্ড মানি করবেন কোন ভুল হলে কতৃপক্ষ দায়র নয়</p>
+            </div>
+            <input type="number" id="playerID" placeholder="প্লেয়ার আইডি (UID)">
+            <input type="text" id="trxID" placeholder="বিকাশ TrxID">
+            <button onclick="confirmOrder()" style="background:#28a745; color:white;">অর্ডার কনফার্ম করুন</button>
+            <button onclick="closeModal()" style="background:#ff4d4d; margin-top:10px;">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPack = "";
+        let selectedPrice = 0;
+
+        function openPayment(name, price) {
+            selectedPack = name;
+            selectedPrice = price;
+            document.getElementById('packName').innerText = name + " - ৳" + price;
+            document.getElementById('paymentModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = "none";
+        }
+
+        function confirmOrder() {
+            const token = "8389300808:AAHdLcNY4V8zxc8hmAVLYputQHTQpyuQpkM"; 
+            const chat_id = "6980640033";
+            const uid = document.getElementById('playerID').value;
+            const trx = document.getElementById('trxID').value;
+
+            if(!uid || !trx) return alert("তথ্য দিন!");
+
+            const msg = `🚀 *NEW ORDER*\n📦 প্যাকেজ: ${selectedPack}\n🎮 UID: ${uid}\n💰 TrxID: ${trx}\n💵 দাম: ৳${selectedPrice}`;
+            const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat_id}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
+
+            fetch(url).then(res => {
+                if(res.ok) {
+                    alert("অর্ডার সফল! আপনার টেলিগ্রামে মেসেজ পৌঁছেছে।");
+                    closeModal();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
