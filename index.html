@@ -9,7 +9,7 @@
         :root { --gold: #ff8c00; --bg: #000000; --card: #111111; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; text-align: center; margin: 0; padding: 0; }
         
-        /* Banner Style */
+        /* Banner Section */
         .banner-container { width: 100%; max-width: 500px; margin: auto; }
         .banner-container img { width: 100%; border-bottom: 3px solid var(--gold); border-radius: 0 0 20px 20px; box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4); }
 
@@ -36,7 +36,7 @@
 <body>
 
     <div class="banner-container">
-        <img src="https://raw.githubusercontent.com/asraf786588-tech/topup/main/banner.jpg" alt="Elite Topup Store Banner" onerror="this.src='https://via.placeholder.com/500x200/ff8c00/000000?text=ELITE+TOPUP+STORE'">
+        <img src="banner.jpg" alt="Elite Topup Store" onerror="this.src='https://via.placeholder.com/500x200/ff8c00/000000?text=ELITE+TOPUP+STORE'">
     </div>
 
     <div class="container">
@@ -75,7 +75,7 @@
         function submitOrder() {
             const id = document.getElementById('pid').value;
             const trx = document.getElementById('trxid').value;
-            if(!p || !id || !trx) { alert("দয়া করে সব তথ্য পূরণ করুন!"); return; }
+            if(!p || !id || !trx) { alert("Please fill all information!"); return; }
 
             const token = "8389300808:AAHdLcNY4V8zxc8hmAVLYputQHTQpyuQpkM"; 
             const chat = "6980640033"; 
@@ -83,10 +83,10 @@
             
             fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}`)
             .then(() => { 
-                alert("আপনার অর্ডারটি সফলভাবে সাবমিট হয়েছে!"); 
+                alert("Your order has been submitted successfully!"); 
                 location.reload(); 
             })
-            .catch(() => alert("Error! আবার চেষ্টা করুন।"));
+            .catch(() => alert("Error! Please try again."));
         }
     </script>
 </body>
